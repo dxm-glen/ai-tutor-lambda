@@ -1,0 +1,27 @@
+service: bedrock-chat
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: us-east-1  
+
+layers:
+  commonDependencies:
+    path: layer  # 레이어에 포함될 파일이 위치한 디렉토리 경로
+    name: langcahin_community  # 레이어 이름
+    description: Common dependencies for the service
+    compatibleRuntimes:
+      - python3.9
+
+functions:
+  bedrockKnowledgeBase:
+    handler: handler.bedrock_knowledge_base_handler
+    timeout: 600
+    layers:
+      - {Ref: CommonDependenciesLambdaLayer}  # 레이어 참조
+    events:
+      - httpApi:
+          path: /query
+          method: post
+          cors: true  
