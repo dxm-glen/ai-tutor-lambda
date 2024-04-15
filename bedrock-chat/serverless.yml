@@ -16,7 +16,7 @@ layers:
 
 functions:
   chat:
-    handler: handler.bedrock_chat_base_handler
+    handler: handler.bedrock_chat_handler
     timeout: 600
     layers:
       - {Ref: CommonDependenciesLambdaLayer}  # 레이어 참조
