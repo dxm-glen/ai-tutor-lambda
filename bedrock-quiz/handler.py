@@ -6,14 +6,17 @@ import boto3
 from langchain_community.chat_models import BedrockChat
 from langchain_community.retrievers import AmazonKnowledgeBasesRetriever
 from langchain.prompts import ChatPromptTemplate
+from langchain.schema import BaseOutputParser
 
 
-def serialize_response(response):
-    return {
-        "content": response.content,
-        "response_metadata": response.response_metadata,
-        "id": response.id,
-    }
+class JsonOutputParser(BaseOutputParser):
+    def parse(self, text):
+        # 텍스트 양끝에 정리하고 json으로 변경해서 python 코드에 쓸 수 있도록 변경
+        text = text.replace("```", "").replace("json", "")
+        return json.loads(text)
+
+
+output_parser = JsonOutputParser()
 
 
 def bedrock_quiz_handler(event, context):
@@ -46,15 +49,17 @@ def bedrock_quiz_handler(event, context):
     # 유저 메시지에 대해 검색
     docs = retriever.get_relevant_documents(query=topic)
     docs_content = "\n\n".join(document.page_content for document in docs)
+    print("topic 관련 뽑아온 것")
+    print(docs_content)
 
-    questions_prompt = ChatPromptTemplate.from_messages(
+    prompt = ChatPromptTemplate.from_messages(
         [
             (
                 "system",
                 """
     You are a helpful assistant that is role playing as a teacher.
          
-    Based ONLY on the following context make 5 questions to test the user's knowledge about the text.
+    Based ONLY on the following context make 5 questions about {topic} to test the user's knowledge about the text.
     
     Each question should have 4 answers, three of them must be incorrect and one should be correct.
          
@@ -81,12 +86,13 @@ def bedrock_quiz_handler(event, context):
          
     Context: {context}
 """,
-            )
+            ),
+            ("human", "topic is {topic}"),
         ]
-    ).format_messages(context=docs_content)
+    ).format_messages(context=docs_content, topic=topic)
 
     # LLM에 전달
-    quiz = bedrock_chat.invoke(questions_prompt)
+    quiz = bedrock_chat.invoke(prompt)
     print(type(quiz))
     print(quiz)
     # response_data = serialize_response(quiz)
@@ -209,18 +215,19 @@ def bedrock_quiz_handler(event, context):
     Your turn!
     Questions: {context}
 """,
-            )
+            ),
+            ("human", "format exam questions into JSON format"),
         ]
     ).format_messages(context=quiz)
     formated_quiz = bedrock_chat.invoke(formatting_prompt)
+    parsed_quiz = output_parser.parse(formated_quiz.content)
     print("포맷팅한 퀴즈")
-    print(type(formated_quiz))
-    print(formated_quiz)
-    response_data = serialize_response(formated_quiz)
+    print(type(parsed_quiz))
+    print(parsed_quiz)
 
     # 답변을 리턴하는 부분
     return {
         "statusCode": 200,
         "headers": {"Content-Type": "application/json"},
-        "body": json.dumps({"response": response_data}, ensure_ascii=False),
+        "body": json.dumps({"response": parsed_quiz}, ensure_ascii=False),
     }

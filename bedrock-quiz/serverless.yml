@@ -17,7 +17,7 @@ layers:
 
 functions:
   quiz:
-    handler: handler.bedrock_knowledge_base_handler
+    handler: handler.bedrock_quiz_handler
     timeout: 600
     layers:
       - {Ref: CommonDependenciesLambdaLayer}  # 레이어 참조
