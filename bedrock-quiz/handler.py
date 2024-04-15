@@ -16,7 +16,7 @@ def serialize_response(response):
     }
 
 
-def bedrock_chat_handler(event, context):
+def bedrock_quiz_handler(event, context):
     # AWS 세션을 설정
     session = boto3.Session(
         aws_access_key_id=os.getenv("AWS_ACCESS_KEY"),
