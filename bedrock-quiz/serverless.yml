@@ -25,4 +25,4 @@ functions:
       - httpApi:
           path: /query
           method: post
-          cors: true  # CORS를 활성화합니다.
+          

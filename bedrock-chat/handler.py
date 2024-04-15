@@ -39,9 +39,10 @@ def bedrock_chat_handler(event, context):
         retrieval_config={"vectorSearchConfiguration": {"numberOfResults": 5}},
     )
 
-    # event에서 user_message 추출
-    body = json.loads(event["body"])
-    user_message = body["user_message"]
+    body = event["body"]
+    user_message = json.loads(body)["body"]["user_message"]
+
+    print(user_message)
 
     # 유저 메시지에 대해 검색
     docs = retriever.get_relevant_documents(query=user_message)

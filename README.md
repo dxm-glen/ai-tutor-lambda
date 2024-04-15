@@ -6,8 +6,10 @@
 2. 필요한 의존성을 `layer/python` 디렉토리 안에 설치합니다.
    예: `pip install -t ./layer/python/ langchain_community langchain`
 3. `layer` 디렉토리 내에서 ZIP 파일을 생성합니다.
-4. `cd layer && zip -r ../layer.zip . && cd .. && cp layer.zip bedrock-chat/layer.zip && cp layer.zip bedrock-quiz/layer.zip`
-5. 람다에 권한 설정 : bedrock
+4. cd layer
+5. zip -r ../bedrock-chat/layer.zip .
+6. zip -r ../bedrock-quiz/layer.zip .
+7. 람다에 권한 설정 : bedrock
 
 # chat 테스트
 
@@ -29,7 +31,7 @@
 
 # 퀴즈 테스트
 
-### 테스트1
+# 테스트1
 
 `{   "body": "{\"topic\": \"wine\"}" }`
 
@@ -60,3 +62,6 @@
   "body": "{\"response\": {\"questions\": [{\"question\": \"IRDS(International Roadmap for Devices and Systems)는 무엇에 대한 로드맵인가?\", \"answers\": [{\"answer\": \"반도체 공정 기술 패러다임\", \"correct\": true}, {\"answer\": \"반도체 제품 마케팅 전략\", \"correct\": false}, {\"answer\": \"반도체 기업 경영 방침\", \"correct\": false}, {\"answer\": \"반도체 인력 양성 계획\", \"correct\": false}]}, {\"question\": \"HIR(Heterogeneous Integration Roadmap)은 무엇에 대한 로드맵인가?\", \"answers\": [{\"answer\": \"반도체 전공정 기술\", \"correct\": false}, {\"answer\": \"반도체 패키징 방법\", \"correct\": true}, {\"answer\": \"반도체 설계 기술\", \"correct\": false}, {\"answer\": \"반도체 제조 장비\", \"correct\": false}]}, {\"question\": \"미래 반도체 핵심 아키텍처로 다루어지지 않는 것은?\", \"answers\": [{\"answer\": \"AI\", \"correct\": false}, {\"answer\": \"양자컴퓨팅\", \"correct\": false}, {\"answer\": \"병렬-직렬 연계\", \"correct\": false}, {\"answer\": \"반도체 소재 개발\", \"correct\": true}]}, {\"question\": \"미래 반도체 엔지니어링 아키텍처의 목표 중 하나가 아닌 것은?\", \"answers\": [{\"answer\": \"연산 속도 향상\", \"correct\": false}, {\"answer\": \"다양한 기능 통합\", \"correct\": false}, {\"answer\": \"전력 소모 최소화\", \"correct\": true}, {\"answer\": \"전자-광-방열 연계\", \"correct\": false}]}, {\"question\": \"강의에서 다루지 않는 내용은?\", \"answers\": [{\"answer\": \"양자정보처리\", \"correct\": false}, {\"answer\": \"고성능컴퓨팅/데이터센터\", \"correct\": false}, {\"answer\": \"집적광학\", \"correct\": false}, {\"answer\": \"반도체 마케팅 전략\", \"correct\": true}]}]}}"
 }
 ```
+
+
+pip install -t ./layer/python/ requests requests_aws4auth

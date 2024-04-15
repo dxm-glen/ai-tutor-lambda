@@ -24,4 +24,4 @@ functions:
       - httpApi:
           path: /query
           method: post
-          cors: true  
+          
