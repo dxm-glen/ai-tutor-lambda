@@ -22,7 +22,6 @@ output_parser = JsonOutputParser()
 
 
 def bedrock_quiz_handler(event, context):
-    # AWS 세션을 설정
     session = boto3.Session(
         aws_access_key_id=os.getenv("AWS_ACCESS_KEY"),
         aws_secret_access_key=os.getenv("AWS_SECRET_KEY"),
@@ -46,7 +45,6 @@ def bedrock_quiz_handler(event, context):
 
     body = event["body"]
     topic = json.loads(body)["body"]["topic"]
-
     docs = retriever.get_relevant_documents(query=topic)
     docs_content = "\n\n".join(document.page_content for document in docs)
     print("topic 관련 뽑아온 것")
@@ -91,11 +89,9 @@ def bedrock_quiz_handler(event, context):
         ]
     ).format_messages(context=docs_content, topic=topic)
 
-    # LLM에 전달
     quiz = bedrock_chat.invoke(prompt)
     print(type(quiz))
     print(quiz)
-    # response_data = serialize_response(quiz)
 
     formatting_prompt = ChatPromptTemplate.from_messages(
         [
@@ -212,7 +208,7 @@ def bedrock_quiz_handler(event, context):
      }}
      ```
     
-    DONT MAKE THIS ERROR : Expecting ',' 
+    DONT MAKE "Expecting ',' " ERROR
     Your turn!
     Questions: {context}
 """,
@@ -228,7 +224,6 @@ def bedrock_quiz_handler(event, context):
     print(type(parsed_quiz))
     print(parsed_quiz)
 
-    # 답변을 리턴하는 부분
     return {
         "statusCode": 200,
         "headers": {"Content-Type": "application/json"},
