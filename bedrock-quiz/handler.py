@@ -1,4 +1,3 @@
-# handler.py
 import json
 import os
 import boto3
@@ -11,9 +10,12 @@ from langchain.schema import BaseOutputParser
 
 class JsonOutputParser(BaseOutputParser):
     def parse(self, text):
-        # 텍스트 양끝에 정리하고 json으로 변경해서 python 코드에 쓸 수 있도록 변경
-        text = text.replace("```", "").replace("json", "")
-        return json.loads(text)
+        cleaned_text = text.replace("```json", "").replace("```", "")
+        try:
+            return json.loads(cleaned_text)
+        except json.JSONDecodeError as e:
+            print("JSON 파싱 오류:", e)
+            raise
 
 
 output_parser = JsonOutputParser()
@@ -42,11 +44,9 @@ def bedrock_quiz_handler(event, context):
         retrieval_config={"vectorSearchConfiguration": {"numberOfResults": 5}},
     )
 
-    # event에서 퀴즈 만들 주제에 대해서 추출
-    body = json.loads(event["body"])
-    topic = body["topic"]
+    body = event["body"]
+    topic = json.loads(body)["body"]["topic"]
 
-    # 유저 메시지에 대해 검색
     docs = retriever.get_relevant_documents(query=topic)
     docs_content = "\n\n".join(document.page_content for document in docs)
     print("topic 관련 뽑아온 것")
@@ -122,7 +122,6 @@ def bedrock_quiz_handler(event, context):
     
      
     Example Output:
-     
     ```json
     {{ "questions": [
             {{
@@ -211,7 +210,9 @@ def bedrock_quiz_handler(event, context):
             }}
         ]
      }}
-    ```
+     ```
+    
+    DONT MAKE THIS ERROR : Expecting ',' 
     Your turn!
     Questions: {context}
 """,
@@ -220,6 +221,8 @@ def bedrock_quiz_handler(event, context):
         ]
     ).format_messages(context=quiz)
     formated_quiz = bedrock_chat.invoke(formatting_prompt)
+    print("내용 뭐냐")
+    print(formated_quiz.content)
     parsed_quiz = output_parser.parse(formated_quiz.content)
     print("포맷팅한 퀴즈")
     print(type(parsed_quiz))
