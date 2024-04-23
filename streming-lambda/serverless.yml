@@ -1,0 +1,15 @@
+service: streming-lambda
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1  
+
+functions:
+  chat:
+    handler: index.handler
+    events:
+      - httpApi:
+          path: /query
+          method: post
